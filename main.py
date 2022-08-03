@@ -1,4 +1,4 @@
-import discord, random, asyncpraw, aiohttp, asyncio, helper
+import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI
 from discord.ext import commands
 from dotenv import load_dotenv
 from os import getenv
@@ -8,13 +8,10 @@ reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
                     client_secret = getenv("REDDIT_CLIENT_SECRET"),
                     user_agent = getenv("REDDIT_USER_AGENT"))
 
-
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
-
-filtered_words = []
 long_homework = ["individual assignment", "long homework"]
-already_sent = False
+already_sent = {"long_homework": False, "noice": False}
 
 @bot.event
 async def on_message(msg):
@@ -25,25 +22,21 @@ async def on_message(msg):
         if (random.randint(0,10) == 2):
             await msg.channel.send("https://c.tenor.com/ASGuOCPGrKEAAAAd/kekw-kek.gif")
     if "noice" == msg.content:
-        await msg.channel.send("https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/thematedkid/phpPlfUuy.gif")
+        if not already_sent["noice"]:
+            await msg.channel.send("https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/thematedkid/phpPlfUuy.gif")
+            already_sent["noice"] = True
+            await asyncio.sleep(60)
+            already_sent["noice"] = False
     for word in long_homework:
         if word in msg.content:
-            if not already_sent:
-                await msg.channel.send(f"Reminder of the rules for long homeworks: \n ", file=discord.File("long_homework.png"))
-                already_sent = True
+            if not already_sent["long_homework"]:
+                homework_channel = bot.get_channel(977627353247268884)
+                await msg.channel.send(f"Remember to read the rules in {homework_channel.mention} before talking about long homework assignments")
+                already_sent["long_homework"] = True
                 await asyncio.sleep(3600)
-                already_sent = False
+                already_sent["long_homework"] = False
 
     await bot.process_commands(msg)
-
-
-@bot.command()
-async def hello(ctx, message):
-    await ctx.channel.send(f"Hello {message}")
-
-@bot.command()
-async def add(ctx, num1:int, num2:int):
-    await ctx.channel.send(f"{num1 + num2}")
 
 @bot.command()
 async def rules(ctx):
@@ -92,6 +85,16 @@ async def remindme(ctx, time, *, msg):
         await asyncio.sleep(sleep_time)
         await ctx.channel.send(f"{ctx.author.mention}: {msg}")
 
+@bot.command()
+async def weather(ctx,*,msg="default"):
+    author = ctx.author.id
+    message = await Weather.checkWeather(author,msg)
+    await ctx.channel.send(message)
+
+@bot.command()
+async def setcity(ctx,*,msg):
+    message = await Weather.set_city(ctx, msg)
+    await ctx.channel.send(message)
 
 # -----------------------------------------------------------------------------------------
 #                               Moderation stuffs
@@ -164,7 +167,7 @@ async def on_command_error(ctx,error):
     elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Please enter all the required args.")
     elif isinstance(error,commands.CommandNotFound):
-        await ctx.send("Command not found, please use .help to see a list of commands")
+        await ctx.send("Command not found, please use !help to see a list of commands")
     else:
         raise error
 
