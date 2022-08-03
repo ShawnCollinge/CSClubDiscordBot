@@ -8,7 +8,6 @@ async def get_data(username):
     params = {
         "username": username
     }
-    print(params)
     async with aiohttp.ClientSession() as session:
         async with session.get(api_link, data=params) as response:
             code = response.status
@@ -34,16 +33,16 @@ async def create_user(username, data):
 async def is_bot_admin(username):
     return get_data(username)['admin']
 
-# bot admin
-async def delete_user(message_data):
-    api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
-    data_to_return = {
-        "is_admin": is_bot_admin(message_data.author),
-        "user": message_data.content[9:],
-    }
-    if (data_to_return['is_admin']):
-        async with aiohttp.ClientSession() as session:
-            async with session.delete(api_link, data={"username": data_to_return['user']}) as response:
-                code = response.status
-                data_to_return['success'] = (code == 200)
-    return data_to_return
+# # bot admin
+# async def delete_user(message_data):
+#     api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
+#     data_to_return = {
+#         "is_admin": is_bot_admin(message_data.author),
+#         "user": message_data.content[9:],
+#     }
+#     if (data_to_return['is_admin']):
+#         async with aiohttp.ClientSession() as session:
+#             async with session.delete(api_link, data={"username": data_to_return['user']}) as response:
+#                 code = response.status
+#                 data_to_return['success'] = (code == 200)
+#     return data_to_return
