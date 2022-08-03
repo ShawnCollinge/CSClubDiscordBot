@@ -96,6 +96,10 @@ async def setcity(ctx,*,msg):
     message = await Weather.set_city(ctx, msg)
     await ctx.channel.send(message)
 
+@bot.command(asliases=["shorten"])
+async def short(ctx,link):
+    await ctx.channel.send(await WebsiteAPI.shorten(link))
+
 
 # -----------------------------------------------------------------------------------------
 #                               Moderation stuffs

@@ -1,11 +1,12 @@
 import os, aiohttp
 from dotenv import load_dotenv
 
-LINK = "http://127.0.0.1:3000/api/"
+LINK = "https://shawnc.net/api/"
 
 async def get_data(username):
     api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
     params = {
+        "type": "user",
         "username": username
     }
     async with aiohttp.ClientSession() as session:
@@ -19,6 +20,7 @@ async def get_data(username):
 async def create_user(username, data):
     api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
     data['username'] = username
+    data['type'] = "user"
     async with aiohttp.ClientSession() as session:
         if (await get_data(username) == False):
             async with session.post(api_link, data=data) as response:
@@ -29,6 +31,16 @@ async def create_user(username, data):
                 code = response.status
                 return code == 200
         
+
+async def shorten(link):
+    api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
+    data = {
+        "url": link,
+        "type": "short"
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(api_link, data=data) as response:
+            return await response.text()
 
 async def is_bot_admin(username):
     return get_data(username)['admin']
