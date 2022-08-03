@@ -96,6 +96,7 @@ async def setcity(ctx,*,msg):
     message = await Weather.set_city(ctx, msg)
     await ctx.channel.send(message)
 
+
 # -----------------------------------------------------------------------------------------
 #                               Moderation stuffs
 # -----------------------------------------------------------------------------------------
