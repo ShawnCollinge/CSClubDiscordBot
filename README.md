@@ -13,6 +13,7 @@ Currently has the following commands:
 !remindme <time(s/m/h/d/w)> <msg> - will tag you in a reminder message after a specified time in your command<br>
 !poll <item1> or <item2> - puts up a poll with 2 items for people to choose between<br>
 !rules - sends a message to the channel of the rules located in rules.txt<br>
+!shorten <url> - will return a shortened url
 
 admin commands - <br>
 !kick <member> [reason] - kicks member from the server<br>
