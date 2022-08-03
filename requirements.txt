@@ -1,0 +1,8 @@
+discord
+random
+asyncpraw
+aiohttp
+asyncio
+helper
+discord.ext
+dotenv

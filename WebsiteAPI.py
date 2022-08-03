@@ -1,4 +1,4 @@
-import os, aiohttp, asyncio
+import os, aiohttp
 from dotenv import load_dotenv
 
 LINK = "http://127.0.0.1:3000/api/"

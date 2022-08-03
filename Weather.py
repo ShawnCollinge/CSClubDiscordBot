@@ -1,4 +1,4 @@
-import os, WebsiteAPI, aiohttp, asyncio
+import os, WebsiteAPI, aiohttp
 
 async def checkWeather(author:str, city):
     if city == "default":
