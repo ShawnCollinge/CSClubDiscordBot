@@ -97,8 +97,11 @@ async def setcity(ctx,*,msg):
     await ctx.channel.send(message)
 
 @bot.command(aliases=["shorten"])
-async def short(ctx,link):
-    await ctx.channel.send(await WebsiteAPI.shorten(link))
+async def short(ctx,link="False"):
+    if (link == False):
+        await ctx.channel.send("Please enter a valid url")
+    else:
+        await ctx.channel.send(await WebsiteAPI.shorten(link))
 
 
 # -----------------------------------------------------------------------------------------
