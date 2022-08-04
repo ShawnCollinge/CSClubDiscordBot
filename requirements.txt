@@ -4,4 +4,4 @@ aiohttp
 asyncio
 helper
 discord.ext
-dotenv
+python-dotenv
