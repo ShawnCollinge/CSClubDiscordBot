@@ -45,7 +45,7 @@ async def shorten(link):
 async def is_bot_admin(username):
     user = await get_data(username)
     if (user == False):
-        user['admin'] = False
+        return False
     return user['admin']
 
 # # bot admin
