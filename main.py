@@ -174,7 +174,7 @@ async def whois(ctx, member:discord.Member):
 async def restart(ctx):
     if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
         await ctx.channel.send("Restarting bot")
-        os.execv(__file__, sys.argv)
+        os.execv(sys.executable, ['python'] + [sys.argv[0]])
     else:
         await ctx.channel.send("You do not have valid permissions for this")    
 
