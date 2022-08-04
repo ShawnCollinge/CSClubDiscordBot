@@ -5,3 +5,4 @@ asyncio
 helper
 discord.ext
 python-dotenv
+gitpython
