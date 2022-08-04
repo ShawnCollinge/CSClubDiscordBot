@@ -186,7 +186,7 @@ async def update(ctx):
     else:
         await ctx.channel.send("You do not have valid permissions for this") 
 
-
+#test 
 @bot.event
 async def on_command_error(ctx,error):
     if isinstance(error, commands.MissingPermissions):
