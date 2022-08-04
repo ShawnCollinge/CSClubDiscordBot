@@ -172,11 +172,11 @@ async def whois(ctx, member:discord.Member):
 
 @bot.command()
 async def restart(ctx):
-    if (WebsiteAPI.is_bot_admin(ctx.author.id)):
-        ctx.channel.send("Restarting bot")
+    if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
+        await ctx.channel.send("Restarting bot")
         os.execv(__file__, sys.argv)
     else:
-        ctx.channel.send("You do not have valid permissions for this")    
+        await ctx.channel.send("You do not have valid permissions for this")    
 
 @bot.command()
 async def update(ctx):
@@ -186,7 +186,7 @@ async def update(ctx):
     else:
         await ctx.channel.send("You do not have valid permissions for this") 
 
-#test 
+
 @bot.event
 async def on_command_error(ctx,error):
     if isinstance(error, commands.MissingPermissions):
