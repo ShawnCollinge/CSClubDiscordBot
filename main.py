@@ -119,7 +119,7 @@ async def python(ctx,*,code):
     await ctx.channel.send(embed=em)
 
 @bot.command()
-async def python(ctx,*,code):
+async def java(ctx,*,code):
     code = code.strip("```java")
     code = code.strip("```")
     results = await helper.compile("java", "1", code)
