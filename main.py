@@ -180,7 +180,7 @@ async def restart(ctx):
 
 @bot.command()
 async def update(ctx):
-    if (WebsiteAPI.is_bot_admin(ctx.author.id)):
+    if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
         msg = await g.pull()
         ctx.channel.send(msg)
     else:
