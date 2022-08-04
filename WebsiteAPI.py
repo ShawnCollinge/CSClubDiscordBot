@@ -44,8 +44,10 @@ async def shorten(link):
 
 async def is_bot_admin(username):
     user = await get_data(username)
+    if (user == False):
+        user['admin'] = False
     return user['admin']
-    
+
 # # bot admin
 # async def delete_user(message_data):
 #     api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
