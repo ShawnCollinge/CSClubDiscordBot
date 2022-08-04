@@ -98,6 +98,10 @@ async def setcity(ctx,*,msg):
     message = await Weather.set_city(ctx, msg)
     await ctx.channel.send(message)
 
+@bot.command()
+async def ping(ctx):
+    await ctx.channel.send("pong")
+
 @bot.command(aliases=["shorten"])
 async def short(ctx,link="False"):
     if (link == False):
