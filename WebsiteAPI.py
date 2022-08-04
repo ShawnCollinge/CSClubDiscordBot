@@ -43,8 +43,9 @@ async def shorten(link):
             return await response.text()
 
 async def is_bot_admin(username):
-    return await get_data(username)['admin']
-
+    user = await get_data(username)
+    return user['admin']
+    
 # # bot admin
 # async def delete_user(message_data):
 #     api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
