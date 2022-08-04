@@ -182,9 +182,9 @@ async def restart(ctx):
 async def update(ctx):
     if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
         msg = await g.pull()
-        ctx.channel.send(msg)
+        await ctx.channel.send(msg)
     else:
-        ctx.channel.send("You do not have valid permissions for this") 
+        await ctx.channel.send("You do not have valid permissions for this") 
 
 
 @bot.event
