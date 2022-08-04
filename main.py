@@ -195,7 +195,7 @@ async def whois(ctx, member:discord.Member):
 @bot.command()
 async def restart(ctx):
     if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
-        with open("channel.txt") as f:
+        with open("channel.txt", "w") as f:
             f.write(str(ctx.channel.id))
         await ctx.channel.send("Restarting bot")
         os.execv(sys.executable, ['python'] + [sys.argv[0]])
