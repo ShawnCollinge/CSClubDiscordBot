@@ -195,8 +195,6 @@ async def whois(ctx, member:discord.Member):
 @bot.command()
 async def restart(ctx):
     if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
-        with open("channel.txt", "w") as f:
-            f.write(str(ctx.channel.id))
         await ctx.channel.send("Restarting bot")
         os.execv(sys.executable, ['python'] + [sys.argv[0]])
     else:
@@ -223,12 +221,3 @@ async def on_command_error(ctx,error):
         raise error
 
 bot.run(getenv("TOKEN"))
-
-async def on_ready(): 
-    print("We have logged in")
-    try:
-        with open("channel.txt") as f:
-            channel = bot.get_channel(int(f.read()))
-            channel.send("Restart complete")
-    except:
-        print("errorrrrrrrr")
