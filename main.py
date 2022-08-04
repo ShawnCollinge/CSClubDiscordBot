@@ -1,4 +1,4 @@
-import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI
+import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI, os, sys, git
 from discord.ext import commands
 from dotenv import load_dotenv
 from os import getenv
@@ -7,6 +7,8 @@ load_dotenv()
 reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
                     client_secret = getenv("REDDIT_CLIENT_SECRET"),
                     user_agent = getenv("REDDIT_USER_AGENT"))
+
+g = git.cmd.Git(os.path.dirname(os.path.realpath(__file__)))
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -167,6 +169,23 @@ async def whois(ctx, member:discord.Member):
     embed.set_footer(icon_url = ctx.author.avatar_url, text = f"Requested by {ctx.author.name}")
 
     await ctx.send(embed=embed)
+
+@bot.command()
+async def restart(ctx):
+    if (WebsiteAPI.is_bot_admin(ctx.author.id)):
+        ctx.channel.send("Restarting bot")
+        os.execv(__file__, sys.argv)
+    else:
+        ctx.channel.send("You do not have valid permissions for this")    
+
+@bot.command()
+async def update(ctx):
+    if (WebsiteAPI.is_bot_admin(ctx.author.id)):
+        msg = await g.pull()
+        ctx.channel.send(msg)
+    else:
+        ctx.channel.send("You do not have valid permissions for this") 
+
 
 @bot.event
 async def on_command_error(ctx,error):

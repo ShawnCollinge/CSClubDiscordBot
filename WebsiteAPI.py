@@ -43,7 +43,7 @@ async def shorten(link):
             return await response.text()
 
 async def is_bot_admin(username):
-    return get_data(username)['admin']
+    return await get_data(username)['admin']
 
 # # bot admin
 # async def delete_user(message_data):
