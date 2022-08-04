@@ -14,8 +14,8 @@ Currently has the following commands:
 !poll \<item1\> or \<item2\> - puts up a poll with 2 items for people to choose between<br>
 !rules - sends a message to the channel of the rules located in rules.txt<br>
 !shorten \<url\> - will return a shortened url<br>
-!python ```python \<code\> ``` - runs the python code and will return the output or error<br>
-!java ```java \<code\>``` - compiles and runs the java code. returns the output or error
+!python \`\`\`python \<code\> \`\`\` - runs the python code and will return the output or error<br>
+!java \`\`\`java \<code\>\`\`\` - compiles and runs the java code. returns the output or error
 
 admin commands - <br>
 !kick \<member\> [reason] - kicks member from the server<br>
