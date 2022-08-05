@@ -1,28 +1,27 @@
 import os, aiohttp
+from xmlrpc.client import boolean
 from dotenv import load_dotenv
 
-LINK = "https://shawnc.net/api/"
+LINK = "http://127.0.0.1:3000/api/"
 
-async def get_data(username):
+async def get_data(id, type):
     api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
-    params = {
-        "type": "user",
-        "username": username
+    data = {
+        "_id": id,
+        "type": type
     }
     async with aiohttp.ClientSession() as session:
-        async with session.get(api_link, data=params) as response:
+        async with session.get(api_link, data=data) as response:
             code = response.status
-            if code == 404 or code == 403:
+            if code != 200:
                 return False
             else:
                 return await response.json()
 
-async def create_user(username, data):
+async def add_data(data:dict) -> boolean:
     api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
-    data['username'] = username
-    data['type'] = "user"
     async with aiohttp.ClientSession() as session:
-        if (await get_data(username) == False):
+        if (await get_data(data["_id"], data["type"]) == False):
             async with session.post(api_link, data=data) as response:
                 code = response.status
                 return code == 200
@@ -47,6 +46,7 @@ async def is_bot_admin(username):
     if (user == False):
         return False
     return user['admin']
+
 
 # # bot admin
 # async def delete_user(message_data):

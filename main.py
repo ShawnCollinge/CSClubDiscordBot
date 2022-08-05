@@ -10,7 +10,9 @@ reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
 
 g = git.cmd.Git(os.path.dirname(os.path.realpath(__file__)))
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix="!", intents=intents)
+intents.members = True
+
+bot = commands.Bot(command_prefix=".", intents=intents)
 long_homework = ["individual assignment", "long homework"]
 already_sent = {"long_homework": False, "noice": False}
 
@@ -94,8 +96,10 @@ async def weather(ctx,*,msg="default"):
 
 @bot.command()
 async def setcity(ctx,*,msg):
-    message = await Weather.set_city(ctx, msg)
-    await ctx.channel.send(message)
+    if (await Weather.set_city(ctx, msg)):
+        await ctx.channel.send(f"Successfully set city to {msg}")
+    else: 
+        await ctx.channel.send(f"Error with setting city to {msg}")
 
 @bot.command()
 async def ping(ctx):
@@ -194,6 +198,30 @@ async def whois(ctx, member:discord.Member):
     await ctx.send(embed=embed)
 
 @bot.command()
+@commands.has_permissions(ban_members=True)
+async def set(ctx,setting, channel: discord.TextChannel):
+    data = {
+        "_id": ctx.guild.id,
+        "type": "server"
+    }
+    if (setting == "join"):
+        data['joinChannel'] = channel.id
+    elif (setting == "leave"):
+        data['leaveChannel'] = channel.id
+    elif (setting == "rules"):
+        data['rulesChannel'] = channel.id
+    elif (setting == "announce"):
+        data['announceChannel'] = channel.id
+    if (await WebsiteAPI.add_data(data)):
+        await ctx.channel.send(f"Set {setting} channel to {channel.mention}")
+    else:
+        await ctx.channel.send("Failure")
+
+# -----------------------------------------------------------------------------------------
+#                               Owner commands
+# -----------------------------------------------------------------------------------------
+
+@bot.command()
 async def restart(ctx):
     if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
         await ctx.channel.send("Restarting bot")
@@ -209,6 +237,28 @@ async def update(ctx):
     else:
         await ctx.channel.send("You do not have valid permissions for this") 
 
+@bot.event
+async def on_member_remove(member):
+    data = await WebsiteAPI.get_data(member.guild.id, "server")
+    if ("leaveChannel" in data):
+        c = bot.get_channel(int(data['leaveChannel']))
+    await c.send(f"**{member}** has left the server")
+
+@bot.event
+async def on_member_join(member):
+    data = await WebsiteAPI.get_data(member.guild.id, "server")
+    embed = discord.Embed(title="Member Joined", description=f"{member.mention}, Welcome to {member.guild.name}. We hope that your time with us is a happy one!")
+    if ("rulesChannel" in data):
+        rules = bot.get_channel(int(data['rulesChannel']))
+        embed.add_field(name="Please check out the Rules Channel!", value=rules.mention, inline=False)
+    if ("announceChannel" in data):
+        announce = bot.get_channel(int(data['announceChannel']))
+        embed.add_field(name="Latest announcements are made here!", value=announce.mention, inline=False)
+    if ("joinChannel" in data):
+        c = bot.get_channel(int(data['joinChannel']))
+    else:
+        c = discord.utils.get(member.guild.channels, name="general")
+    await c.send(embed=embed)
 
 @bot.event
 async def on_command_error(ctx,error):

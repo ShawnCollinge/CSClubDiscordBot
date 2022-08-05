@@ -2,11 +2,11 @@ import os, WebsiteAPI, aiohttp
 
 async def checkWeather(author:str, city):
     if city == "default":
-        city = await WebsiteAPI.get_data(author)
-        if city == False:
+        data = await WebsiteAPI.get_data(author, "user")
+        if data == False:
             return "Please select a valid city"
         else:
-            city = city['city']
+            city = data['city']
     
     params = {
             "appid": os.getenv("WEATHER_API"),
@@ -24,9 +24,8 @@ async def checkWeather(author:str, city):
 
 async def set_city(message, city):
     data = {
-        "city": city
+        "_id": message.author.id,
+        "city": city,
+        "type": "user"
     }
-    if (await WebsiteAPI.create_user(message.author.id, data)):
-        return f"Successfully set city to {city}"
-    else: 
-        return f"Error with setting city to {city}"
+    return await WebsiteAPI.add_data(data)
