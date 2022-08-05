@@ -9,7 +9,6 @@ reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
                     user_agent = getenv("REDDIT_USER_AGENT"))
 
 g = git.cmd.Git(os.path.dirname(os.path.realpath(__file__)))
-
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 long_homework = ["individual assignment", "long homework"]
@@ -111,8 +110,9 @@ async def short(ctx,link="False"):
     
 @bot.command()
 async def python(ctx,*,code):
-    code = code.strip("```python")
-    code = code.strip("```")
+    if "```python" in code:
+        code = code.strip("```python")
+        code = code.strip("```")
     results = await helper.compile("python3", "4", code)
     em = discord.Embed(title = "Python")
     em.add_field(name="output", value=results)
@@ -120,8 +120,9 @@ async def python(ctx,*,code):
 
 @bot.command()
 async def java(ctx,*,code):
-    code = code.strip("```java")
-    code = code.strip("```")
+    if "```" in code:
+        code = code.strip("```java")
+        code = code.strip("```")
     results = await helper.compile("java", "1", code)
     em = discord.Embed(title = "Java")
     em.add_field(name="output", value=results)
