@@ -110,7 +110,7 @@ async def short(ctx,link="False"):
     
 @bot.command()
 async def python(ctx,*,code):
-    if "```python" in code:
+    if code[:3] == "```":
         code = code.strip("```python")
         code = code.strip("```")
     results = await helper.compile("python3", "4", code)
@@ -120,7 +120,7 @@ async def python(ctx,*,code):
 
 @bot.command()
 async def java(ctx,*,code):
-    if "```" in code:
+    if code[:3] == "```":
         code = code.strip("```java")
         code = code.strip("```")
     results = await helper.compile("java", "1", code)
