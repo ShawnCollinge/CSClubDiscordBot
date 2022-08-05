@@ -2,10 +2,8 @@ import os, aiohttp
 from xmlrpc.client import boolean
 from dotenv import load_dotenv
 
-LINK = "http://127.0.0.1:3000/api/"
-
 async def get_data(id, type):
-    api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
+    api_link = f"{os.getenv('LINK')}{os.getenv('WEBSITE_API')}"
     data = {
         "_id": id,
         "type": type
@@ -19,7 +17,7 @@ async def get_data(id, type):
                 return await response.json()
 
 async def add_data(data:dict) -> boolean:
-    api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
+    api_link = f"{os.getenv('LINK')}{os.getenv('WEBSITE_API')}"
     async with aiohttp.ClientSession() as session:
         if (await get_data(data["_id"], data["type"]) == False):
             async with session.post(api_link, data=data) as response:
@@ -32,7 +30,7 @@ async def add_data(data:dict) -> boolean:
         
 
 async def shorten(link):
-    api_link = f"{LINK}{os.getenv('WEBSITE_API')}"
+    api_link = f"{os.getenv('LINK')}{os.getenv('WEBSITE_API')}"
     data = {
         "url": link,
         "type": "short"
