@@ -23,6 +23,7 @@ admin commands - <br>
 !clear [number] - will clear the number specified of messages from chat (default is 2)<br>
 !unban \<member\> - will unban the member<br>
 !whois \<member\> - will return a whois on the member.<br>
+!set \<join/leave/announce/rules\> \<channel\> - join sets the channel to message when someone joins the server, default is general. Leave sets the channel to message when someone leaves the server, announce sets the channel to tell new members when they join where announcements are posted, rules sets the rules channel to link new members to when they join.
 
 bot owner commands - <br>
 !update - pulls most recent code from this repository<br>
