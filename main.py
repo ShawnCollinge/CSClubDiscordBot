@@ -12,7 +12,7 @@ g = git.cmd.Git(os.path.dirname(os.path.realpath(__file__)))
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix=".", intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 long_homework = ["individual assignment", "long homework"]
 already_sent = {"long_homework": False, "noice": False}
 
