@@ -80,7 +80,7 @@ async def kanye(ctx):
 
 @bot.command(aliases=["r", "reminder", "remind"])
 async def remindme(ctx, time, *, msg):
-    sleep_time = helper.convert(time)
+    sleep_time = int(helper.convert(time))
     if sleep_time == -1:
         await ctx.channel.send(f"Invalid syntax.")
     else:
