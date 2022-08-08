@@ -18,7 +18,6 @@ async def get_data(id, type):
 
 async def add_data(data:dict) -> boolean:
     api_link = f"{os.getenv('LINK')}{os.getenv('WEBSITE_API')}"
-    print(api_link)
     async with aiohttp.ClientSession() as session:
         if (await get_data(data["_id"], data["type"]) == False):
             async with session.post(api_link, data=data) as response:
