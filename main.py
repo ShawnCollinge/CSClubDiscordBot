@@ -118,9 +118,7 @@ async def python(ctx,*,code):
         code = code.strip("```python")
         code = code.strip("```")
     results = await helper.compile("python3", "4", code)
-    em = discord.Embed(title = "Python")
-    em.add_field(name="output", value=results)
-    await ctx.channel.send(embed=em)
+    await ctx.channel.send(f"```{results}```")
 
 @bot.command()
 async def java(ctx,*,code):
@@ -128,9 +126,7 @@ async def java(ctx,*,code):
         code = code.strip("```java")
         code = code.strip("```")
     results = await helper.compile("java", "1", code)
-    em = discord.Embed(title = "Java")
-    em.add_field(name="output", value=results)
-    await ctx.channel.send(embed=em)
+    await ctx.channel.send(f"```{results}```")
 
 
 # -----------------------------------------------------------------------------------------
