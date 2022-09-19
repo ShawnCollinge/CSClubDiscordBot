@@ -9,7 +9,7 @@ reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
                     user_agent = getenv("REDDIT_USER_AGENT"))
 
 g = git.cmd.Git(os.path.dirname(os.path.realpath(__file__)))
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 
 bot = commands.Bot(command_prefix=os.getenv("COMMAND"), intents=intents)
