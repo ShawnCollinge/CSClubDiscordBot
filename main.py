@@ -16,7 +16,7 @@ intents.members = True
 bot = commands.Bot(command_prefix=os.getenv("COMMAND"), intents=intents)
 long_homework = ["individual assignment", "long homework"]
 already_sent = {"long_homework": False, "noice": False}
-announce_id = 998327226489651302
+announce_id = 895806644578025516
 
 @bot.event
 async def on_message(msg):
