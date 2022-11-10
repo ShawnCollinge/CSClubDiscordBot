@@ -2,6 +2,7 @@ import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI
 from discord.ext import commands
 from dotenv import load_dotenv
 from os import getenv
+from datetime import date
 load_dotenv()
 
 reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
@@ -15,12 +16,22 @@ intents.members = True
 bot = commands.Bot(command_prefix=os.getenv("COMMAND"), intents=intents)
 long_homework = ["individual assignment", "long homework"]
 already_sent = {"long_homework": False, "noice": False}
+announce_id = 998327226489651302
 
 @bot.event
 async def on_message(msg):
     if (msg.author.bot):
         return
     global already_sent
+    if msg.channel.id == announce_id:
+        data = {
+            "_id": msg.id,
+            "message": msg.content,
+            "type": "announcement",
+            "author": msg.author.name,
+            "date": date.today()
+        }
+        await WebsiteAPI.add_data(data)
     if "lol" in msg.content:
         if (random.randint(0,10) == 2):
             await msg.channel.send("https://c.tenor.com/ASGuOCPGrKEAAAAd/kekw-kek.gif")
@@ -63,13 +74,14 @@ async def poll(ctx,*,msg):
 
 @bot.command()
 async def meme(ctx):
+    channel = ctx.channel
     subreddit = await reddit.subreddit("ProgrammerHumor")
     random_submission = await subreddit.random()
     name = random_submission.title
     url = random_submission.url
     em = discord.Embed(title = name, url = f"http://reddit.com{random_submission.permalink}")
     em.set_image(url = url)
-    await ctx.channel.send(embed=em)
+    await channel.send(embed=em)
 
 @bot.command()
 async def kanye(ctx):
@@ -255,6 +267,17 @@ async def on_member_join(member):
     else:
         c = discord.utils.get(member.guild.channels, name="general")
     await c.send(embed=embed)
+
+@bot.event
+async def on_message_edit(message_before, msg):
+    if msg.channel.id == announce_id:
+        data = {
+        "_id": msg.id,
+        "message": msg.content,
+        "type": "announcement",
+        "author": msg.author.name
+        }
+        await WebsiteAPI.add_data(data)
 
 @bot.event
 async def on_command_error(ctx,error):
