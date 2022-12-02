@@ -26,7 +26,7 @@ async def on_message(msg):
     if msg.channel.id == announce_id:
         data = {
             "_id": msg.id,
-            "message": msg.content,
+            "message": msg.clean_content,
             "type": "announcement",
             "author": msg.author.name,
             "date": date.today()
