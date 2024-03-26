@@ -144,21 +144,32 @@ async def java(ctx,*,code):
 # -----------------------------------------------------------------------------------------
 #                               Moderation stuffs
 # -----------------------------------------------------------------------------------------
+async def is_authorized(ctx):
+    if ctx.author.guild_permissions.kick_members:
+        return True
+    if await WebsiteAPI.is_bot_admin(ctx.author.id):
+        return True
+    await ctx.send("You do not have the required permissions or roles to use this command.")
+    return False
+
 @bot.command(aliases=["c"])
-@commands.has_permissions(manage_messages = True)
 async def clear(ctx, amount:int=2):
+    if not await is_authorized(ctx):
+        return
     await ctx.channel.purge(limit = amount)
 
 @bot.command(aliases=["b"])
-@commands.has_permissions(ban_members=True)
 async def ban(ctx, member:discord.Member,*,reason="No reason provided"):
+    if not await is_authorized(ctx):
+        return
     await ctx.send(f"{member.name} has been banned from the server for: {reason}")
     await member.send(f"You have been banned from the server for reason: {reason}")
     await member.ban(reason=reason)
 
 @bot.command(aliases=['ub'])
-@commands.has_permissions(ban_members=True)
 async def unban(ctx,*,member):
+    if not await is_authorized(ctx):
+        return
     banned_users = await ctx.guild.bans()
     member_name, member_disc = member.split("#")
     for banned_user in banned_users:
@@ -170,33 +181,37 @@ async def unban(ctx,*,member):
     await ctx.send(f"{member} was not found.")
 
 @bot.command(aliases=["k"])
-@commands.has_permissions(kick_members = True)
 async def kick(ctx, member : discord.Member, *, reason="No reason provided"):
+    if not await is_authorized(ctx):
+        return
     await ctx.send(f"{member.name} has been kicked from the server for: {reason}")
     await member.send(f"You have been kicked from the server for reason: {reason}")
     await member.kick(reason=reason)
 
 @bot.command(aliases=["m"])
-@commands.has_permissions(kick_members = True)
 async def mute(ctx, member: discord.Member):
-   mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
-   await member.add_roles(mutedRole)
-   await member.send(f" you have mutedd from: - {ctx.guild.name}")
-   embed = discord.Embed(title="unmute", description=f" muted-{member.mention}",colour=discord.Colour.light_gray())
-   await ctx.send(embed=embed)
+    if not await is_authorized(ctx):
+        return
+    mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
+    await member.add_roles(mutedRole)
+    await member.send(f" you have mutedd from: - {ctx.guild.name}")
+    embed = discord.Embed(title="unmute", description=f" muted-{member.mention}",colour=discord.Colour.light_gray())
+    await ctx.send(embed=embed)
 
 @bot.command(aliases=["um"])
-@commands.has_permissions(kick_members = True)
 async def unmute(ctx, member: discord.Member):
-   mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
-   await member.remove_roles(mutedRole)
-   await member.send(f" you have unmutedd from: - {ctx.guild.name}")
-   embed = discord.Embed(title="unmute", description=f" unmuted-{member.mention}",colour=discord.Colour.light_gray())
-   await ctx.send(embed=embed)
+    if not await is_authorized(ctx):
+        return
+    mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
+    await member.remove_roles(mutedRole)
+    await member.send(f" you have unmutedd from: - {ctx.guild.name}")
+    embed = discord.Embed(title="unmute", description=f" unmuted-{member.mention}",colour=discord.Colour.light_gray())
+    await ctx.send(embed=embed)
 
 @bot.command(aliases=["user", "info"])
-@commands.has_permissions(kick_members=True)
 async def whois(ctx, member:discord.Member):
+    if not await is_authorized(ctx):
+        return
     embed = discord.Embed(title = member.name, description = member.mention, color = discord.Colour.red())
     embed.add_field(name = "ID", value = member.id, inline = True)
     embed.add_field(name="Top role", value = member.top_role)
@@ -206,8 +221,9 @@ async def whois(ctx, member:discord.Member):
     await ctx.send(embed=embed)
 
 @bot.command()
-@commands.has_permissions(ban_members=True)
 async def set(ctx,setting, channel: discord.TextChannel):
+    if not await is_authorized(ctx):
+        return
     data = {
         "_id": ctx.guild.id,
         "type": "server"
@@ -289,5 +305,12 @@ async def on_command_error(ctx,error):
         await ctx.send("Command not found, please use !help to see a list of commands")
     else:
         raise error
+
+async def scheduled_message():
+    channel = bot.get_channel(getenv("CHANNEL_ID"))
+    if channel:
+        message_ = await channel.send("Quiz check")
+        await message_.add_reaction("✅")
+        await message_.add_reaction("❎")
 
 bot.run(getenv("TOKEN"))
