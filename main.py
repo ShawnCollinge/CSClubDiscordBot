@@ -7,7 +7,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 load_dotenv()
 
-
 reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
                     client_secret = getenv("REDDIT_CLIENT_SECRET"),
                     user_agent = getenv("REDDIT_USER_AGENT"))
@@ -50,14 +49,6 @@ async def on_message(msg):
             already_sent["noice"] = True
             await asyncio.sleep(60)
             already_sent["noice"] = False
-    for word in long_homework:
-        if word in msg.content:
-            if not already_sent["long_homework"]:
-                homework_channel = bot.get_channel(977627353247268884)
-                await msg.channel.send(f"Remember to read the rules in {homework_channel.mention} before talking about long homework assignments")
-                already_sent["long_homework"] = True
-                await asyncio.sleep(3600)
-                already_sent["long_homework"] = False
 
     await bot.process_commands(msg)
 
@@ -260,17 +251,43 @@ async def schedule(ctx, days: str, hour: int, minute: int, *, message: str):
         await ctx.send("You are not authorized to use this command.")
         return
 
-    # Process the days argument to ensure compatibility with APScheduler
     days = days.lower().replace('monday', 'mon').replace('tuesday', 'tue') \
         .replace('wednesday', 'wed').replace('thursday', 'thu') \
         .replace('friday', 'fri').replace('saturday', 'sat').replace('sunday', 'sun')
 
-    # Schedule the message
     scheduler.add_job(scheduled_message, 
                       CronTrigger(day_of_week=days, hour=hour, minute=minute, timezone='America/Los_Angeles'), 
                       args=[ctx.channel.id, message])
 
     await ctx.send(f"Message scheduled in this channel on {days} at {hour:02d}:{minute:02d}.")
+
+@bot.command()
+async def list_schedules(ctx):
+    if not (await WebsiteAPI.is_bot_admin(ctx.author.id)):
+        await ctx.send("You are not authorized to use this command.")
+        return
+    
+    jobs = scheduler.get_jobs()
+    if jobs:
+        response = "**Scheduled Messages:**\n"
+        for job in jobs:
+            response += f"ID: `{job.id}` - Next Run: {job.next_run_time}\n"
+        await ctx.send(response)
+    else:
+        await ctx.send("No scheduled messages found.")
+
+@bot.command()
+async def delete_schedule(ctx, job_id: str):
+    if not (await WebsiteAPI.is_bot_admin(ctx.author.id)):
+        await ctx.send("You are not authorized to use this command.")
+        return
+    
+    job = scheduler.get_job(job_id)
+    if job:
+        job.remove()
+        await ctx.send(f"Deleted scheduled message with ID `{job_id}`.")
+    else:
+        await ctx.send(f"No scheduled message found with ID `{job_id}`.")
 
 @bot.command()
 async def restart(ctx):
@@ -335,6 +352,7 @@ async def on_command_error(ctx,error):
 
 async def scheduled_message(channel_id, message):
     channel = bot.get_channel(channel_id)
+    print(f"EXECUTED - {channel_id}")
     if channel:
         message_ = await channel.send(message)
         await message_.add_reaction("✅")
