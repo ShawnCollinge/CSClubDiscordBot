@@ -1,9 +1,12 @@
-import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI, os, sys, git
+import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI, os, sys, git, pytz
 from discord.ext import commands
 from dotenv import load_dotenv
 from os import getenv
 from datetime import date
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 load_dotenv()
+
 
 reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
                     client_secret = getenv("REDDIT_CLIENT_SECRET"),
@@ -17,6 +20,14 @@ bot = commands.Bot(command_prefix=os.getenv("COMMAND"), intents=intents)
 long_homework = ["individual assignment", "long homework"]
 already_sent = {"long_homework": False, "noice": False}
 announce_id = 895806644578025516
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user.name}')
+    tz = pytz.timezone('America/Los_Angeles')
+    scheduler = AsyncIOScheduler(timezone=tz)
+    scheduler.add_job(scheduled_message, CronTrigger(day_of_week='mon,wed,fri', hour=13, minute=46))
+    scheduler.start()
 
 @bot.event
 async def on_message(msg):
