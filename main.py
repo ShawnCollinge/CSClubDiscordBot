@@ -26,7 +26,7 @@ async def on_ready():
     print(f'Logged in as {bot.user.name}')
     tz = pytz.timezone('America/Los_Angeles')
     scheduler = AsyncIOScheduler(timezone=tz)
-    scheduler.add_job(scheduled_message, CronTrigger(day_of_week='mon,wed,fri', hour=13, minute=46))
+    scheduler.add_job(scheduled_message, CronTrigger(day_of_week='tue', hour=13, minute=48))
     scheduler.start()
 
 @bot.event
