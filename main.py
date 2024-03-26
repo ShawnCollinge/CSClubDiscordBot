@@ -26,7 +26,7 @@ async def on_ready():
     print(f'Logged in as {bot.user.name}')
     tz = pytz.timezone('America/Los_Angeles')
     scheduler = AsyncIOScheduler(timezone=tz)
-    scheduler.add_job(scheduled_message, CronTrigger(day_of_week='tue', hour=13, minute=48))
+    scheduler.add_job(scheduled_message, CronTrigger(day_of_week='tue', hour=13, minute=50))
     scheduler.start()
 
 @bot.event
@@ -318,6 +318,7 @@ async def on_command_error(ctx,error):
         raise error
 
 async def scheduled_message():
+    print("IT WORKED")
     channel = bot.get_channel(getenv("CHANNEL_ID"))
     if channel:
         message_ = await channel.send("Quiz check")
