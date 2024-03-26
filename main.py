@@ -270,9 +270,8 @@ async def list_schedules(ctx):
     jobs = scheduler.get_jobs()
     if jobs:
         response = "**Scheduled Messages:**\n"
-        print(jobs)
         for job in jobs:
-            response += f"ID: `{job.id}` - Next Run: {job.next_run_time}\n"
+            response += f"ID: `{job.id}` - Next Run: {job.name}\n"
         await ctx.send(response)
     else:
         await ctx.send("No scheduled messages found.")
