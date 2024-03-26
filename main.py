@@ -254,9 +254,11 @@ async def schedule(ctx, days: str, hour: int, minute: int, *, message: str):
     days = days.lower().replace('monday', 'mon').replace('tuesday', 'tue') \
         .replace('wednesday', 'wed').replace('thursday', 'thu') \
         .replace('friday', 'fri').replace('saturday', 'sat').replace('sunday', 'sun')
-
+    print(days)
+    print(hour)
+    print(minute)
     scheduler.add_job(scheduled_message, 
-                      CronTrigger(day_of_week=days, hour=hour, minute=minute, timezone='America/Los_Angeles'), 
+                      CronTrigger(day_of_week=days, hour=hour, minute=minute), 
                       args=[ctx.channel.id, message])
 
     await ctx.send(f"Message scheduled in this channel on {days} at {hour:02d}:{minute:02d}.")
