@@ -20,14 +20,12 @@ bot = commands.Bot(command_prefix=os.getenv("COMMAND"), intents=intents)
 long_homework = ["individual assignment", "long homework"]
 already_sent = {"long_homework": False, "noice": False}
 announce_id = 895806644578025516
+tz = pytz.timezone('America/Los_Angeles')
+scheduler = AsyncIOScheduler(timezone=tz)
 
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    tz = pytz.timezone('America/Los_Angeles')
-    scheduler = AsyncIOScheduler(timezone=tz)
-    scheduler.add_job(scheduled_message, CronTrigger(day_of_week='tue', hour=13, minute=53))
-    scheduler.start()
 
 @bot.event
 async def on_message(msg):
@@ -257,6 +255,24 @@ async def set(ctx,setting, channel: discord.TextChannel):
 # -----------------------------------------------------------------------------------------
 
 @bot.command()
+async def schedule(ctx, days: str, hour: int, minute: int, *, message: str):
+    if not (await WebsiteAPI.is_bot_admin(ctx.author.id)):
+        await ctx.send("You are not authorized to use this command.")
+        return
+
+    # Process the days argument to ensure compatibility with APScheduler
+    days = days.lower().replace('monday', 'mon').replace('tuesday', 'tue') \
+        .replace('wednesday', 'wed').replace('thursday', 'thu') \
+        .replace('friday', 'fri').replace('saturday', 'sat').replace('sunday', 'sun')
+
+    # Schedule the message
+    scheduler.add_job(scheduled_message, 
+                      CronTrigger(day_of_week=days, hour=hour, minute=minute, timezone='America/Los_Angeles'), 
+                      args=[ctx.channel.id, message])
+
+    await ctx.send(f"Message scheduled in this channel on {days} at {hour:02d}:{minute:02d}.")
+
+@bot.command()
 async def restart(ctx):
     if (await WebsiteAPI.is_bot_admin(ctx.author.id)):
         await ctx.channel.send("Restarting bot")
@@ -317,11 +333,14 @@ async def on_command_error(ctx,error):
     else:
         raise error
 
-async def scheduled_message():
-    print("IT WORKED")
-    channel = bot.get_channel(getenv("CHANNEL_ID"))
-    message_ = await channel.send("Quiz check")
-    await message_.add_reaction("✅")
-    await message_.add_reaction("❎")
+async def scheduled_message(channel_id, message):
+    channel = bot.get_channel(channel_id)
+    if channel:
+        message_ = await channel.send(message)
+        await message_.add_reaction("✅")
+        await message_.add_reaction("❎")
+    else:
+        print(f"Channel {channel_id} not found.")
+
 
 bot.run(getenv("TOKEN"))
