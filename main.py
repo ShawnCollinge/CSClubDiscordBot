@@ -28,6 +28,7 @@ already_sent = {"long_homework": False, "noice": False}
 announce_id = 895806644578025516
 tz = pytz.timezone('America/Los_Angeles')
 scheduler = AsyncIOScheduler(timezone=tz)
+scheduler.start()
 
 @bot.event
 async def on_ready():
@@ -272,6 +273,7 @@ async def schedule(ctx, days: str, hour: int, minute: int, *, message: str):
         .replace('wednesday', 'wed').replace('thursday', 'thu') \
         .replace('friday', 'fri').replace('saturday', 'sat').replace('sunday', 'sun')
     scheduler.add_job(scheduled_message,CronTrigger(day_of_week=days, hour=hour, minute=minute),args=[ctx.channel.id, message])
+
     await ctx.send(f"Message scheduled in this channel on {days} at {hour:02d}:{minute:02d}.")
 
 @bot.command()
