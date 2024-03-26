@@ -1,10 +1,17 @@
-import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI, os, sys, git, pytz
+import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI, os, sys, git, pytz, apscheduler
 from discord.ext import commands
 from dotenv import load_dotenv
 from os import getenv
 from datetime import date
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+import logging
+
+# Setup basic configuration for logging
+logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='a',
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 load_dotenv()
 
 reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
@@ -245,6 +252,16 @@ async def set(ctx,setting, channel: discord.TextChannel):
 #                               Owner commands
 # -----------------------------------------------------------------------------------------
 
+
+def job_error_listener(event):
+    job = scheduler.get_job(event.job_id)
+    if job:  # Check if job is not None
+        logging.error(f"Job {job.id} failed to execute: {event.exception}")
+    else:
+        logging.error(f"Job with ID {event.job_id} failed to execute, but job could not be found.")
+
+scheduler.add_listener(job_error_listener, apscheduler.events.EVENT_JOB_ERROR)
+
 @bot.command()
 async def schedule(ctx, days: str, hour: int, minute: int, *, message: str):
     if not (await WebsiteAPI.is_bot_admin(ctx.author.id)):
@@ -254,13 +271,7 @@ async def schedule(ctx, days: str, hour: int, minute: int, *, message: str):
     days = days.lower().replace('monday', 'mon').replace('tuesday', 'tue') \
         .replace('wednesday', 'wed').replace('thursday', 'thu') \
         .replace('friday', 'fri').replace('saturday', 'sat').replace('sunday', 'sun')
-    print(days)
-    print(hour)
-    print(minute)
-    scheduler.add_job(scheduled_message, 
-                      CronTrigger(day_of_week=days, hour=hour, minute=minute), 
-                      args=[ctx.channel.id, message])
-
+    scheduler.add_job(scheduled_message,CronTrigger(day_of_week=days, hour=hour, minute=minute),args=[ctx.channel.id, message])
     await ctx.send(f"Message scheduled in this channel on {days} at {hour:02d}:{minute:02d}.")
 
 @bot.command()
@@ -273,7 +284,7 @@ async def list_schedules(ctx):
     if jobs:
         response = "**Scheduled Messages:**\n"
         for job in jobs:
-            response += f"ID: `{job.id}` - Next Run: {job.name}\n"
+            response += f"ID: `{job.id}` - Next Run: {job.next_run_time}\n"
         await ctx.send(response)
     else:
         await ctx.send("No scheduled messages found.")
@@ -354,7 +365,6 @@ async def on_command_error(ctx,error):
 
 async def scheduled_message(channel_id, message):
     channel = bot.get_channel(channel_id)
-    print(f"EXECUTED - {channel_id}")
     if channel:
         message_ = await channel.send(message)
         await message_.add_reaction("✅")
