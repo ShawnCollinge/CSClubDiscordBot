@@ -29,7 +29,7 @@ async def on_ready():
 
 async def mock_shaan(msg):
     ret = ""
-    for i in len(msg):
+    for i in range(len(msg)):
         if i % 2 == 0:
             ret += msg[i].upper()
         else:
