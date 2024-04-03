@@ -17,7 +17,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix=os.getenv("COMMAND"), intents=intents)
 long_homework = ["individual assignment", "long homework"]
-already_sent = {"long_homework": False, "noice": False}
+already_sent = {"long_homework": False, "noice": False, "shaan": False}
 announce_id = 895806644578025516
 tz = pytz.timezone('America/Los_Angeles')
 scheduler = AsyncIOScheduler(timezone=tz)
