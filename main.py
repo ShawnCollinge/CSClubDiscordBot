@@ -1,17 +1,10 @@
-import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI, os, sys, git, pytz, apscheduler
+import discord, random, asyncpraw, aiohttp, asyncio, helper, Weather, WebsiteAPI, os, sys, git, pytz
 from discord.ext import commands
 from dotenv import load_dotenv
 from os import getenv
 from datetime import date
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-import logging
-
-# Setup basic configuration for logging
-logging.basicConfig(level=logging.INFO, filename='bot_errors.log', filemode='a',
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-
-
 load_dotenv()
 
 reddit = asyncpraw.Reddit(client_id = getenv("REDDIT_CLIENT_ID"),
@@ -34,6 +27,15 @@ scheduler.start()
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
 
+async def mock_shaan(msg):
+    ret = ""
+    for i in len(msg):
+        if i % 2 == 0:
+            ret += msg[i].upper()
+        else:
+            ret += msg[i].lower()
+    return ret
+
 @bot.event
 async def on_message(msg):
     if (msg.author.bot):
@@ -48,6 +50,15 @@ async def on_message(msg):
             "date": date.today()
         }
         await WebsiteAPI.add_data(data)
+    if msg.author.id == 280133155619602432 or msg.author.id == 408491888522428419:
+        if not already_sent["shaan"]:
+            if "bad bot" in msg.content:
+                await msg.channel.send(mock_shaan(msg.content))
+                already_sent["shaan"] = True
+                await asyncio.sleep(60)
+                already_sent["shaan"] = False
+            elif (random.randint(0,10) == 2) and msg.author.id != 408491888522428419:
+                await msg.channel.send(mock_shaan(msg.content))
     if "lol" in msg.content:
         if (random.randint(0,10) == 2):
             await msg.channel.send("https://c.tenor.com/ASGuOCPGrKEAAAAd/kekw-kek.gif")
@@ -202,7 +213,7 @@ async def mute(ctx, member: discord.Member):
         return
     mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
     await member.add_roles(mutedRole)
-    await member.send(f" you have mutedd from: - {ctx.guild.name}")
+    await member.send(f" you have muted from: - {ctx.guild.name}")
     embed = discord.Embed(title="unmute", description=f" muted-{member.mention}",colour=discord.Colour.light_gray())
     await ctx.send(embed=embed)
 
@@ -212,7 +223,7 @@ async def unmute(ctx, member: discord.Member):
         return
     mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
     await member.remove_roles(mutedRole)
-    await member.send(f" you have unmutedd from: - {ctx.guild.name}")
+    await member.send(f" you have unmuted from: - {ctx.guild.name}")
     embed = discord.Embed(title="unmute", description=f" unmuted-{member.mention}",colour=discord.Colour.light_gray())
     await ctx.send(embed=embed)
 
@@ -252,16 +263,6 @@ async def set(ctx,setting, channel: discord.TextChannel):
 # -----------------------------------------------------------------------------------------
 #                               Owner commands
 # -----------------------------------------------------------------------------------------
-
-
-def job_error_listener(event):
-    job = scheduler.get_job(event.job_id)
-    if job:  # Check if job is not None
-        logging.error(f"Job {job.id} failed to execute: {event.exception}")
-    else:
-        logging.error(f"Job with ID {event.job_id} failed to execute, but job could not be found.")
-
-scheduler.add_listener(job_error_listener, apscheduler.events.EVENT_JOB_ERROR)
 
 @bot.command()
 async def schedule(ctx, days: str, hour: int, minute: int, *, message: str):
