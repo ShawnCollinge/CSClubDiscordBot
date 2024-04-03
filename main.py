@@ -53,12 +53,12 @@ async def on_message(msg):
     if msg.author.id == 280133155619602432 or msg.author.id == 408491888522428419:
         if not already_sent["shaan"]:
             if "bad bot" in msg.content:
-                await msg.channel.send(mock_shaan(msg.content))
+                await msg.channel.send(await mock_shaan(msg.content))
                 already_sent["shaan"] = True
                 await asyncio.sleep(60)
                 already_sent["shaan"] = False
             elif (random.randint(0,10) == 2) and msg.author.id != 408491888522428419:
-                await msg.channel.send(mock_shaan(msg.content))
+                await msg.channel.send(mock_shaan(await msg.content))
     if "lol" in msg.content:
         if (random.randint(0,10) == 2):
             await msg.channel.send("https://c.tenor.com/ASGuOCPGrKEAAAAd/kekw-kek.gif")
